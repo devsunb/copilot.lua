@@ -196,11 +196,11 @@ local function get_current_suggestion(ctx)
 
   local ok, choice = pcall(function()
     if
-        not vim.fn.mode():match("^[iR]")
-        or (copilot.hide_during_completion and vim.fn.pumvisible() == 1)
-        or vim.b.copilot_suggestion_hidden
-        or not ctx.suggestions
-        or #ctx.suggestions == 0
+      not vim.fn.mode():match("^[iR]")
+      or (copilot.hide_during_completion and vim.fn.pumvisible() == 1)
+      or vim.b.copilot_suggestion_hidden
+      or not ctx.suggestions
+      or #ctx.suggestions == 0
     then
       return nil
     end
@@ -250,7 +250,7 @@ local function update_preview(ctx)
   local cursor_col = vim.fn.col(".")
 
   displayLines[1] =
-      string.sub(string.sub(suggestion.text, 1, (string.find(suggestion.text, "\n", 1, true) or 0) - 1), cursor_col)
+    string.sub(string.sub(suggestion.text, 1, (string.find(suggestion.text, "\n", 1, true) or 0) - 1), cursor_col)
 
   local extmark = {
     id = copilot.extmark_id,
@@ -486,7 +486,9 @@ function mod.accept(modifier)
   -- Hack for 'autoindent', makes the indent persist. Check `:help 'autoindent'`.
   vim.schedule_wrap(function()
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Space><Left><Del>", true, false, true), "n", false)
-    vim.lsp.util.apply_text_edits({ { range = range, newText = newText } }, vim.api.nvim_get_current_buf(), "utf-16")
+    local bufnr = vim.api.nvim_get_current_buf()
+    local encoding = vim.api.nvim_get_option_value("fileencoding", { buf = bufnr })
+    vim.lsp.util.apply_text_edits({ { range = range, newText = newText } }, bufnr, encoding)
     -- Put cursor at the end of current line.
     local cursor_keys = "<End>"
     if has_nvim_0_10_x then
